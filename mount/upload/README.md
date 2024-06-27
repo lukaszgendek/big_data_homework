@@ -1,0 +1,1 @@
+This folder is initially empty and must be kept, because it gets mounted in the docker.
