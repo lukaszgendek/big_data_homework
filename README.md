@@ -106,7 +106,7 @@ It is easier to test data there, because the unit test executes in millis.
 ## Configuration
 
 You can configure each module using the following files
-- consumer.properties
+- [consumer.properties](consumer.properties)
 - streams.properties
 - producer.properties
 
