@@ -1,0 +1,75 @@
+version: '2.1'
+services:
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.1.1
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  # reachable on 9092 from the host and on 29092 from inside docker compose
+  kafka:
+    image: confluentinc/cp-kafka:6.1.1
+    depends_on:
+      - zookeeper
+    ports:
+      - '9092:9092'
+    expose:
+      - '29092'
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
+      KAFKA_MIN_INSYNC_REPLICAS: '1'
+
+  init-kafka:
+    image: confluentinc/cp-kafka:6.1.1
+    depends_on:
+      - kafka
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until kafka is reachable
+      kafka-topics --bootstrap-server kafka:29092 --list
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic input-topic --replication-factor 1 --partitions 12
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic output-topic --replication-factor 1 --partitions 12
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafka:29092 --list
+      "
+
+  producer:
+    build: producer
+    image: kafka-producer/producer:latest
+    depends_on:
+      - init-kafka
+    environment:
+      CONFIG_FILE: /tmp/application.properties
+    volumes:
+      - ./mount/upload:/tmp/upload
+      - ./mount/uploaded:/tmp/uploaded
+      - ./producer.properties:/tmp/application.properties
+
+  streams:
+    build: streams
+    image: kafka-streams/streams:latest
+    depends_on:
+      - init-kafka
+    environment:
+      CONFIG_FILE: /tmp/application.properties
+    volumes:
+      - ./streams.properties:/tmp/application.properties
+
+  consumer:
+    build: consumer
+    image: kafka-consumer/consumer:latest
+    depends_on:
+      - init-kafka
+    environment:
+      CONFIG_FILE: /tmp/application.properties
+    volumes:
+      - ./consumer.properties:/tmp/application.properties
+      - ./mount/output:/tmp/output

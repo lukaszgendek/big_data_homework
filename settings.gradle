@@ -1,0 +1,5 @@
+rootProject.name = 'homework'
+include 'streams'
+include 'producer'
+include 'consumer'
+
