@@ -99,6 +99,9 @@ The last time window
 27th 12.00-13.00 
 ```
 has not yet been closed. There still may appear events, so Kafka Streams has not produced a final result yet.
+This set of test data has been also been included in the unit test (in the streams module) based on kafka streams test utils library. 
+It is easier to test data there, because the unit test executes in millis.
+
 
 ## Configuration
 
