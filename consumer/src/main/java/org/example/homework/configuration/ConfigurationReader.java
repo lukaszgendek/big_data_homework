@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
-import java.util.Optional;
 import java.util.Properties;
 
 public class ConfigurationReader {

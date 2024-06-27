@@ -4,24 +4,12 @@ package org.example.homework.kafka;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.Properties;
-
-import static java.time.LocalDateTime.of;
 import static java.time.ZoneOffset.UTC;
-import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
-import static java.time.temporal.ChronoField.HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
-import static java.time.temporal.ChronoField.NANO_OF_SECOND;
-import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import static java.util.Arrays.asList;
 
 
 import org.apache.kafka.common.serialization.*;
-import org.apache.kafka.test.TestUtils;
 import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.kstream.*;
 import org.apache.kafka.streams.test.TestRecord;
@@ -95,7 +83,7 @@ public class WindowAggregateTest {
         System.out.println(topology.describe());
 
         try (var topologyTestDriver = new TopologyTestDriver(topology,
-                createTopologyConfiguration())) {
+                props)) {
             // Step 2: Setup input and output topics.
             var input = topologyTestDriver
                     .createInputTopic(configuration.inputTopic(), new StringSerializer(), new StringSerializer());
@@ -131,14 +119,4 @@ public class WindowAggregateTest {
         stringTimeWindowedDeserializer.setIsChangelogTopic(true);
         return stringTimeWindowedDeserializer;
     }
-
-    private Properties createTopologyConfiguration() {
-        var properties = new Properties();
-        properties.put(StreamsConfig.APPLICATION_ID_CONFIG, APPLICATION_NAME);
-        properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        // Use a temporary directory for storing state, which will be automatically removed after the test.
-        properties.put(StreamsConfig.STATE_DIR_CONFIG, TestUtils.tempDirectory().getAbsolutePath());
-        return properties;
-    }
-
 }
