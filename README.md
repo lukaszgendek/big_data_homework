@@ -120,3 +120,5 @@ Note: To run on minikube
 1. type: minikube start --mount-string="$HOME:/hosthome" --mount
 2. make ~/upload and ~/uploaded directories to load the intput and read the output data
 3. kubectl apply -f .
+
+To continously deliver with argocd follow the tutorial https://spacelift.io/blog/argocd
