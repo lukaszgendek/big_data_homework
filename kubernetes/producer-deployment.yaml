@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer
+  labels:
+    app: producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: producer
+  template:
+    metadata:
+      labels:
+        app: producer
+    spec:
+      containers:
+      - name: producer
+        image: lukaszgendek/big_data_homework:kafka-producer
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 512Mi
+        volumeMounts:
+        - name: mounted-volume
+          mountPath: /mounted-volume
+        - name: configuration
+          mountPath: /configuration
+        env:
+          - name: CONFIG_FILE
+            value: /configuration/application.properties
+      volumes:
+      - name: mounted-volume
+        hostPath:
+          path: /hosthome/images-volume
+      - name: configuration
+        configMap: 
+          name: producer
+          items:
+            - key: application.properties
+              path: application.properties

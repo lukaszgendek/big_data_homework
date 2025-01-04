@@ -115,3 +115,8 @@ specifying the optional user-agent parameter, interval period, window size, topi
 
 ## Author
 [Lukasz Gendek](https://www.linkedin.com/in/%C5%82ukasz-gendek-0ba3b0a/)
+
+Note: To run on minikube 
+1. type: minikube start --mount-string="$HOME:/hosthome" --mount
+2. make ~/upload and ~/uploaded directories to load the intput and read the output data
+3. kubectl apply -f .

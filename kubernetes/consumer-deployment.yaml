@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer
+  labels:
+    app: consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer
+  template:
+    metadata:
+      labels:
+        app: consumer
+    spec:
+      containers:
+      - name: consumer
+        image: lukaszgendek/big_data_homework:kafka-consumer
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 512Mi
+        volumeMounts:
+        - name: mounted-volume
+          mountPath: /mounted-volume
+        - name: configuration
+          mountPath: /configuration
+        env:
+          - name: CONFIG_FILE
+            value: /configuration/application.properties
+      volumes:
+      - name: mounted-volume
+        hostPath:
+          path: /hosthome/images-volume
+      - name: configuration
+        configMap: 
+          name: consumer
+          items:
+            - key: application.properties
+              path: application.properties
